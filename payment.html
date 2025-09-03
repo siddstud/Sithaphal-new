@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Checkout - Sithaphal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'playfair': ['Playfair Display', 'serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-gray-50">
+    <!-- Header -->
+    <header class="bg-white shadow-md">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="index.html" class="text-3xl font-playfair text-green-800">Sithaphal</a>
+            <div class="flex items-center space-x-4">
+                <div class="flex items-center space-x-2 text-green-600">
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"></path>
+                    </svg>
+                    <span class="text-sm font-medium">Secure Checkout</span>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Progress Bar -->
+    <div class="bg-white border-b">
+        <div class="container mx-auto px-6 py-4">
+            <div class="flex items-center justify-center space-x-8">
+                <div class="flex items-center">
+                    <div class="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center text-white text-sm font-bold">✓</div>
+                    <span class="ml-2 text-sm text-green-600 font-medium">Cart</span>
+                </div>
+                <div class="w-16 h-0.5 bg-green-500"></div>
+                <div class="flex items-center">
+                    <div class="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center text-white text-sm font-bold">2</div>
+                    <span class="ml-2 text-sm text-green-600 font-medium">Checkout</span>
+                </div>
+                <div class="w-16 h-0.5 bg-gray-300"></div>
+                <div class="flex items-center">
+                    <div class="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center text-gray-600 text-sm font-bold">3</div>
+                    <span class="ml-2 text-sm text-gray-600">Confirmation</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <main class="container mx-auto px-6 py-8">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Left Column - Forms -->
+            <div class="lg:col-span-2 space-y-6">
+                <!-- Contact Information -->
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <div class="flex items-center justify-between mb-6">
+                        <h2 class="text-2xl font-playfair text-gray-800">Contact Information</h2>
+                        <div class="flex items-center space-x-2 text-sm text-gray-600">
+                            <span>Already have an account?</span>
+                            <a href="#" class="text-green-600 hover:text-green-700 font-medium">Sign in</a>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Email Address *</label>
+                            <input type="email" id="email" class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent" placeholder="your@email.com" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Phone Number *</label>
+                            <input type="tel" id="phone" class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent" placeholder="+1 (555) 123-4567" required>
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <label class="flex items-center">
+                            <input type="checkbox" class="rounded border-gray-300 text-green-600 focus:ring-green-500">
+                            <span class="ml-2 text-sm text-gray-600">Keep me updated on special offers and new products</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Shipping Address -->
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <h2 class="text-2xl font-playfair text-gray-800 mb-6">Shipping Address</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">First Name *</label>
+                            <input type="text" id="firstName" class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Last Name *</label>
+                            <input type="text" id="lastName" class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent" required>
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Company (Optional)</label>
+                            <input type="text" id="company" class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Address *</label>
+                            <input type="text" id="address" class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent" placeholder="Street address" required>
+                        </div>
+                        <div class="md:col-span-2">
+                            <input type="text" id="address2" class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent" placeholder="Apartment, suite, etc. (optional)">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">City *</label>
+                            <input type="text" id="city" class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">State *</label>
+                            <select id="state" class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent" required>
+                                <option value="">Select State</option>
+                                <option value="AL">Alabama</option>
+                                <option value="CA">California</option>
+                                <option value="FL">Florida</option>
+                                <option value="NY">New York</option>
+                                <option value="TX">Texas</option>
+                                <!-- Add more states as needed -->
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">ZIP Code *</label>
+                            <input type="text" id="zipCode" class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Country *</label>
+                            <select id="country" class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent" required>
+                                <option value="US">United States</option>
+                                <option value="CA">Canada</option>
+                                <option value="UK">United Kingdom</option>
+                                <option value="AU">Australia</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Billing Address -->
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <h2 class="text-2xl font-playfair text-gray-800 mb-6">Billing Address</h2>
+                    <div class="mb-4">
+                        <label class="flex items-center">
+                            <input type="checkbox" id="sameAsShipping" class="rounded border-gray-300 text-green-600 focus:ring-green-500" checked>
+                            <span class="ml-2 text-sm text-gray-700">Same as shipping address</span>
+                        </label>
+                    </div>
+                    <div id="billingForm" class="hidden grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Billing form fields (same structure as shipping) -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">First Name *</label>
+                            <input type="text" class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Last Name *</label>
+                            <input type="text" class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                        </div>
+                        <!-- Add more billing fields as needed -->
+                    </div>
+                </div>
+
+                <!-- Shipping Method -->
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <h2 class="text-2xl font-playfair text-gray-800 mb-6">Shipping Method</h2>
+                    <div class="space-y-4">
+                        <label class="flex items-center justify-between p-4 border border-gray-200 rounded-lg cursor-pointer hover:border-green-500 transition-colors">
+                            <div class="flex items-center">
+                                <input type="radio" name="shipping" value="standard" class="text-green-600 focus:ring-green-500" checked>
+                                <div class="ml-3">
+                                    <div class="font-medium text-gray-900">Standard Shipping</div>
+                                    <div class="text-sm text-gray-600">5-7 business days</div>
+                                </div>
+                            </div>
+                            <span class="font-medium text-gray-900">$5.99</span>
+                        </label>
+                        <label class="flex items-center justify-between p-4 border border-gray-200 rounded-lg cursor-pointer hover:border-green-500 transition-colors">
+                            <div class="flex items-center">
+                                <input type="radio" name="shipping" value="express" class="text-green-600 focus:ring-green-500">
+                                <div class="ml-3">
+                                    <div class="font-medium text-gray-900">Express Shipping</div>
+                                    <div class="text-sm text-gray-600">2-3 business days</div>
+                                </div>
+                            </div>
+                            <span class="font-medium text-gray-900">$12.99</span>
+                        </label>
+                        <label class="flex items-center justify-between p-4 border border-gray-200 rounded-lg cursor-pointer hover:border-green-500 transition-colors">
+                            <div class="flex items-center">
+                                <input type="radio" name="shipping" value="overnight" class="text-green-600 focus:ring-green-500">
+                                <div class="ml-3">
+                                    <div class="font-medium text-gray-900">Overnight Shipping</div>
+                                    <div class="text-sm text-gray-600">Next business day</div>
+                                </div>
+                            </div>
+                            <span class="font-medium text-gray-900">$24.99</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Payment Method -->
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <h2 class="text-2xl font-playfair text-gray-800 mb-6">Payment Method</h2>
+                    
+                    <!-- Payment Method Selection -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                        <label class="payment-method-card flex flex-col items-center p-4 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-green-500 transition-colors">
+                            <input type="radio" name="paymentMethod" value="card" class="sr-only" checked>
+                            <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mb-2">
+                                <svg class="w-6 h-6 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M4 4a2 2 0 00-2 2v1h16V6a2 2 0 00-2-2H4zM18 9H2v5a2 2 0 002 2h12a2 2 0 002-2V9zM4 13a1 1 0 011-1h1a1 1 0 110 2H5a1 1 0 01-1-1zm5-1a1 1 0 100 2h1a1 1 0 100-2H9z"></path>
+                                </svg>
+                            </div>
+                            <span class="text-sm font-medium">Credit Card</span>
+                        </label>
+                        <label class="payment-method-card flex flex-col items-center p-4 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-green-500 transition-colors">
+                            <input type="radio" name="paymentMethod" value="paypal" class="sr-only">
+                            <div class="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center mb-2">
+                                <span class="text-yellow-600 font-bold text-lg">P</span>
+                            </div>
+                            <span class="text-sm font-medium">PayPal</span>
+                        </label>
+                        <label class="payment-method-card flex flex-col items-center p-4 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-green-500 transition-colors">
+                            <input type="radio" name="paymentMethod" value="apple" class="sr-only">
+                            <div class="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mb-2">
+                                <span class="text-gray-600 font-bold text-lg">🍎</span>
+                            </div>
+                            <span class="text-sm font-medium">Apple Pay</span>
+                        </label>
+                    </div>
+
+                    <!-- Credit Card Form -->
+                    <div id="cardForm" class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Card Number *</label>
+                            <div class="relative">
+                                <input type="text" id="cardNumber" class="w-full border border-gray-300 rounded-lg px-4 py-3 pr-12 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent" placeholder="1234 5678 9012 3456" maxlength="19">
+                                <div class="absolute right-3 top-1/2 transform -translate-y-1/2">
+                                    <div id="cardBrand" class="w-8 h-5 bg-gray-200 rounded"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Expiry Date *</label>
+                                <input type="text" id="expiryDate" class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent" placeholder="MM/YY" maxlength="5">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">CVV *</label>
+                                <input type="text" id="cvv" class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent" placeholder="123" maxlength="4">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Cardholder Name *</label>
+                            <input type="text" id="cardholderName" class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent" placeholder="John Doe">
+                        </div>
+                    </div>
+
+                    <!-- Security Features -->
+                    <div class="mt-6 p-4 bg-green-50 rounded-lg border border-green-200">
+                        <div class="flex items-center space-x-2 text-green-700">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"></path>
+                            </svg>
+                            <span class="text-sm font-medium">Your payment information is encrypted and secure</span>
+                        </div>
+                        <div class="mt-2 flex items-center space-x-4 text-xs text-green-600">
+                            <span>🔒 SSL Encrypted</span>
+                            <span>🛡️ PCI Compliant</span>
+                            <span>✅ 256-bit Security</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column - Order Summary -->
+            <div class="lg:col-span-1">
+                <div class="bg-white rounded-xl shadow-lg p-6 sticky top-4">
+                    <h2 class="text-2xl font-playfair text-gray-800 mb-6">Order Summary</h2>
+                    
+                    <!-- Cart Items -->
+                    <div class="space-y-4 mb-6">
+                        <div class="flex items-center space-x-4 p-4 bg-gray-50 rounded-lg">
+                            <img src="Gemini_Generated_Image_8ssjtg8ssjtg8ssj.png" alt="Sweetest Sithaphal" class="w-16 h-16 object-cover rounded-lg">
+                            <div class="flex-1">
+                                <h4 class="font-medium text-gray-900">Sweetest Sithaphal</h4>
+                                <p class="text-sm text-gray-600">Qty: 2</p>
+                            </div>
+                            <span class="font-medium text-gray-900">$14.98</span>
+                        </div>
+                        <div class="flex items-center space-x-4 p-4 bg-gray-50 rounded-lg">
+                            <img src="Gemini_Generated_Image_jxmzvujxmzvujxmz.png" alt="Family Pack" class="w-16 h-16 object-cover rounded-lg">
+                            <div class="flex-1">
+                                <h4 class="font-medium text-gray-900">Family Pack</h4>
+                                <p class="text-sm text-gray-600">Qty: 1</p>
+                            </div>
+                            <span class="font-medium text-gray-900">$19.99</span>
+                        </div>
+                    </div>
+
+                    <!-- Promo Code -->
+                    <div class="mb-6">
+                        <div class="flex space-x-2">
+                            <input type="text" id="promoCode" class="flex-1 border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="Promo code">
+                            <button class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium transition-colors">Apply</button>
+                        </div>
+                    </div>
+
+                    <!-- Order Totals -->
+                    <div class="space-y-3 mb-6">
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-600">Subtotal</span>
+                            <span class="text-gray-900">$34.97</span>
+                        </div>
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-600">Shipping</span>
+                            <span class="text-gray-900" id="shippingCost">$5.99</span>
+                        </div>
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-600">Tax</span>
+                            <span class="text-gray-900">$3.24</span>
+                        </div>
+                        <div class="border-t pt-3">
+                            <div class="flex justify-between text-lg font-bold">
+                                <span class="text-gray-900">Total</span>
+                                <span class="text-gray-900" id="totalAmount">$44.20</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Complete Order Button -->
+                    <button id="completeOrder" class="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-bold py-4 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-xl relative overflow-hidden group">
+                        <span class="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700"></span>
+                        <span class="relative flex items-center justify-center space-x-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                            </svg>
+                            <span>Complete Order</span>
+                        </span>
+                    </button>
+
+                    <!-- Trust Badges -->
+                    <div class="mt-6 text-center">
+                        <div class="text-xs text-gray-600 mb-2">Trusted by thousands of customers</div>
+                        <div class="flex justify-center space-x-4 text-2xl">
+                            <span title="Visa">💳</span>
+                            <span title="Mastercard">💳</span>
+                            <span title="PayPal">🅿️</span>
+                            <span title="Apple Pay">🍎</span>
+                            <span title="Google Pay">🔵</span>
+                        </div>
+                    </div>
+
+                    <!-- Money Back Guarantee -->
+                    <div class="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                        <div class="flex items-center space-x-2 text-blue-700">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                            </svg>
+                            <span class="text-sm font-medium">30-Day Money Back Guarantee</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Order Confirmation Modal -->
+    <div id="orderConfirmationModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 transform scale-95 transition-transform">
+            <div class="p-8 text-center">
+                <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                </div>
+                <h3 class="text-2xl font-playfair text-gray-900 mb-2">Order Confirmed!</h3>
+                <p class="text-gray-600 mb-4">Thank you for your purchase. Your order #SP-2024-001 has been confirmed.</p>
+                <div class="bg-gray-50 rounded-lg p-4 mb-6">
+                    <div class="text-sm text-gray-600">Estimated Delivery</div>
+                    <div class="font-medium text-gray-900">March 15-17, 2024</div>
+                </div>
+                <div class="space-y-3">
+                    <button class="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-3 px-4 rounded-lg transition-colors">Track Your Order</button>
+                    <button class="w-full bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium py-3 px-4 rounded-lg transition-colors">Continue Shopping</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="payment.js"></script>
+    
+    <!-- Enhanced CSS for micro-interactions -->
+    <style>
+        /* Smooth form field animations */
+        .form-field-container {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .form-field-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #10b981, transparent);
+            transition: left 0.6s ease;
+        }
+        
+        .form-field-container.focused::before {
+            left: 100%;
+        }
+        
+        /* Card hover effects */
+        .payment-method-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .payment-method-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Progress bar animation */
+        .progress-step {
+            transition: all 0.4s ease;
+        }
+        
+        .progress-step.completed {
+            animation: stepComplete 0.6s ease;
+        }
+        
+        @keyframes stepComplete {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        /* Button ripple effect */
+        .btn-ripple {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn-ripple::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+        
+        .btn-ripple:active::before {
+            width: 300px;
+            height: 300px;
+        }
+        
+        /* Floating label animation */
+        .floating-label {
+            position: relative;
+        }
+        
+        .floating-label input:focus + label,
+        .floating-label input:not(:placeholder-shown) + label {
+            transform: translateY(-1.5rem) scale(0.8);
+            color: #10b981;
+        }
+        
+        .floating-label label {
+            position: absolute;
+            left: 0.75rem;
+            top: 0.75rem;
+            transition: all 0.3s ease;
+            pointer-events: none;
+            color: #6b7280;
+        }
+        
+        /* Card number typing animation */
+        .card-input {
+            font-family: 'Courier New', monospace;
+            letter-spacing: 0.1em;
+        }
+        
+        /* Success checkmark animation */
+        .success-checkmark {
+            animation: checkmark 0.6s ease-in-out;
+        }
+        
+        @keyframes checkmark {
+            0% {
+                transform: scale(0) rotate(0deg);
+                opacity: 0;
+            }
+            50% {
+                transform: scale(1.2) rotate(180deg);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(1) rotate(360deg);
+                opacity: 1;
+            }
+        }
+        
+        /* Pulse animation for security badges */
+        .security-badge {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.7;
+            }
+        }
+        
+        /* Smooth transitions for all interactive elements */
+        input, select, button {
+            transition: all 0.3s ease;
+        }
+        
+        input:focus, select:focus {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.15);
+        }
+        
+        /* Loading skeleton animation */
+        .skeleton {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+        }
+        
+        @keyframes loading {
+            0% {
+                background-position: 200% 0;
+            }
+            100% {
+                background-position: -200% 0;
+            }
+        }
+        
+        /* Mobile responsiveness enhancements */
+        @media (max-width: 768px) {
+            .container {
+                padding-left: 1rem;
+                padding-right: 1rem;
+            }
+            
+            .grid.lg\\:grid-cols-3 {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+            
+            .lg\\:col-span-2 {
+                order: 2;
+            }
+            
+            .lg\\:col-span-1 {
+                order: 1;
+            }
+            
+            .payment-method-card {
+                padding: 1rem;
+            }
+            
+            .grid.grid-cols-2 {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            
+            .grid.grid-cols-3 {
+                grid-template-columns: 1fr;
+                gap: 0.75rem;
+            }
+            
+            .text-3xl {
+                font-size: 1.875rem;
+            }
+            
+            .text-2xl {
+                font-size: 1.5rem;
+            }
+            
+            .space-x-4 > * + * {
+                margin-left: 0.5rem;
+            }
+            
+            .p-6 {
+                padding: 1rem;
+            }
+            
+            .px-6 {
+                padding-left: 1rem;
+                padding-right: 1rem;
+            }
+            
+            /* Modal adjustments for mobile */
+            .fixed.inset-0 > div {
+                margin: 1rem;
+                max-height: calc(100vh - 2rem);
+                overflow-y: auto;
+            }
+            
+            /* Form input adjustments */
+            input, select {
+                font-size: 16px; /* Prevents zoom on iOS */
+                padding: 0.75rem;
+            }
+            
+            /* Button adjustments */
+            button {
+                min-height: 44px; /* Touch target size */
+                padding: 0.75rem 1rem;
+            }
+            
+            /* Progress bar mobile */
+            .flex.items-center.justify-between {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+            
+            .flex.items-center.justify-between > div {
+                width: 100%;
+                text-align: center;
+            }
+            
+            /* Cart items mobile layout */
+            .flex.items-center.space-x-4 {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.75rem;
+            }
+            
+            .flex.items-center.space-x-4 img {
+                width: 100%;
+                max-width: 200px;
+                height: auto;
+            }
+            
+            .flex.items-center.space-x-4 .flex-1 {
+                width: 100%;
+            }
+            
+            /* Security badges mobile */
+            .flex.items-center.space-x-2 {
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 0.5rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .container {
+                padding-left: 0.5rem;
+                padding-right: 0.5rem;
+            }
+            
+            .p-6 {
+                padding: 0.75rem;
+            }
+            
+            .text-lg {
+                font-size: 1rem;
+            }
+            
+            .space-y-6 > * + * {
+                margin-top: 1rem;
+            }
+            
+            .space-y-4 > * + * {
+                margin-top: 0.75rem;
+            }
+            
+            /* Smaller buttons on very small screens */
+            button {
+                font-size: 0.875rem;
+                padding: 0.625rem 0.875rem;
+            }
+            
+            /* Adjust modal for very small screens */
+            .fixed.inset-0 > div {
+                margin: 0.5rem;
+                max-height: calc(100vh - 1rem);
+            }
+        }
+        
+        /* Touch-friendly enhancements */
+        @media (hover: none) and (pointer: coarse) {
+            .payment-method-card:hover {
+                transform: none;
+            }
+            
+            .payment-method-card:active {
+                transform: scale(0.98);
+                transition: transform 0.1s ease;
+            }
+            
+            button:active {
+                transform: scale(0.98);
+            }
+            
+            input:focus, select:focus {
+                transform: none;
+                box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.5);
+            }
+        }
+    </style>
+</body>
+</html>

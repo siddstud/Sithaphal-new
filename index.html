@@ -1,0 +1,1043 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sithaphal - The Royal Fruit</title>
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://cdn.jsdelivr.net/npm/three@0.161.0/build/three.module.js",
+                "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.161.0/examples/jsm/"
+            }
+        }
+    </script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'playfair': ['Playfair Display', 'serif'],
+                        'sans': ['Roboto', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            200: '#bbf7d0',
+                            300: '#86efac',
+                            400: '#4ade80',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d',
+                            800: '#166534',
+                            900: '#14532d',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="styles/chat.css">
+    <style>
+        /* Flower Animation Styles */
+        @keyframes burst-out {
+            0% {
+                transform: translate(0, 0) scale(0.1);
+                opacity: 0;
+            }
+            5% {
+                opacity: 1;
+            }
+            100% {
+                transform: 
+                    translate(
+                        calc(var(--endX) * 1px), 
+                        calc(var(--endY) * 1px)
+                    ) 
+                    scale(1) 
+                    rotate(calc(var(--rotation) * 1deg));
+                opacity: 0;
+            }
+        }
+        
+        .flower {
+            position: fixed;
+            pointer-events: none;
+            z-index: 1000;
+            font-size: 1.8rem;
+            user-select: none;
+            will-change: transform, opacity;
+            text-shadow: 0 0 8px rgba(255,255,255,0.9);
+            opacity: 0;
+            /* Performance optimizations */
+            backface-visibility: hidden;
+            transform: translateZ(0);
+            -webkit-font-smoothing: subpixel-antialiased;
+            /* Smoother animation */
+            animation-fill-mode: forwards;
+            animation-timing-function: cubic-bezier(0.1, 0.8, 0.2, 1);
+        }
+        
+        #story-content.hidden {
+            display: none;
+        }
+        
+        #story-content {
+            animation: fadeIn 1s ease-in-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Button animation */
+        #story-trigger {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        #story-trigger:active {
+            transform: scale(0.98);
+        }
+    </style>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-gray-100 text-gray-800">
+
+    <!-- Header -->
+    <header class="fixed top-0 left-0 w-full bg-white bg-opacity-80 backdrop-blur-md z-50 shadow-md">
+        <nav class="container mx-auto px-6 py-3 flex justify-between items-center">
+            <a href="#" id="home-link" class="text-3xl font-playfair text-green-800 flex-shrink-0">Sithaphal</a>
+            
+            <div class="flex items-center space-x-8 ml-auto">
+                <a href="#" id="home-link-nav" class="text-gray-600 hover:text-green-800 transition-colors">Home</a>
+                <a href="products.html" class="text-gray-600 hover:text-green-800 transition-colors">Products</a>
+                <a href="blog.html" class="text-gray-600 hover:text-green-800 transition-colors">Blog</a>
+                <a href="#contact" class="text-gray-600 hover:text-green-800 transition-colors">Contact</a>
+                
+                <button id="cart-button" class="relative p-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-600 hover:text-green-800 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                    </svg>
+                    <span id="cart-count" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center hidden">0</span>
+                </button>
+                
+                <div class="relative">
+                    <button id="profile-button" class="p-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-gray-600 hover:text-green-800 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </button>
+                    <div id="profile-dropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-xl z-20 overflow-hidden py-1">
+                        <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                            <i class="fas fa-user mr-2 w-5"></i> My Profile
+                        </a>
+                        <a href="#" id="wishlist-link" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                            <i class="fas fa-heart mr-2 w-5"></i> Wishlist
+                            <span id="wishlist-count" class="ml-auto bg-red-100 text-red-800 text-xs px-2 py-0.5 rounded-full">0</span>
+                        </a>
+                        <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                            <i class="fas fa-shopping-bag mr-2 w-5"></i> Orders
+                        </a>
+                        <div class="border-t border-gray-100 my-1"></div>
+                        <a href="#" id="signin-link" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                            <i class="fas fa-sign-in-alt mr-2 w-5"></i> Sign In
+                        </a>
+                        <a href="#" id="signup-link" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                            <i class="fas fa-user-plus mr-2 w-5"></i> Sign Up
+                        </a>
+                        <a href="#" id="signout-link" class="hidden px-4 py-2 text-sm text-red-600 hover:bg-red-50">
+                            <i class="fas fa-sign-out-alt mr-2 w-5"></i> Sign Out
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main id="main-content" class="page">
+        <!-- Hero Section with Sithaphal Tree -->
+        <section class="hero relative flex items-center justify-center text-white overflow-hidden min-h-screen">
+            <!-- Background Image with Overlay -->
+            <div class="absolute inset-0 z-0">
+                <img src="Gemini_Generated_Image_qn4hr5qn4hr5qn4h.png" alt="Fresh Sithaphal Fruit" class="w-full h-full object-cover">
+                <div class="absolute inset-0 bg-gradient-to-r from-black/40 to-black/20"></div>
+            </div>
+            <!-- Floating Data Cards -->
+            <div class="floating-data-cards absolute inset-0 pointer-events-none">
+                <!-- Card 5 - Middle Left - Protein -->
+                <div class="data-card absolute top-1/2 left-8 transform -translate-y-1/2 bg-white/90 backdrop-blur-sm rounded-2xl p-3 shadow-2xl -rotate-6 hover:rotate-0 transition-all duration-700 opacity-100 z-20" style="animation: fade-in-up 0.8s ease-out 1.5s both;">
+                    <div class="flex items-center space-x-2">
+                        <div class="w-10 h-10 bg-gradient-to-r from-purple-500 to-pink-600 rounded-full flex items-center justify-center flex-shrink-0">
+                            <span class="text-white text-lg">💪</span>
+                        </div>
+                        <div>
+                            <div class="text-xl font-bold text-gray-800">1.7-2.1g</div>
+                            <div class="text-xs text-gray-600">Protein</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 6 - Middle Right - Carbs -->
+                <div class="data-card absolute top-1/2 right-8 transform -translate-y-1/2 bg-white/90 backdrop-blur-sm rounded-2xl p-3 shadow-2xl rotate-6 hover:rotate-0 transition-all duration-700 opacity-100 z-20" style="animation: fade-in-up 0.8s ease-out 2.5s both;">
+                    <div class="flex items-center space-x-2">
+                        <div class="w-10 h-10 bg-gradient-to-r from-red-500 to-orange-500 rounded-full flex items-center justify-center flex-shrink-0">
+                            <span class="text-white text-lg">🌾</span>
+                        </div>
+                        <div>
+                            <div class="text-xl font-bold text-gray-800">23-25g</div>
+                            <div class="text-xs text-gray-600">Carbs</div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Card 1 - Top Left (Moved further left) -->
+                <div class="data-card absolute top-32 -left-2 md:top-40 md:left-4 lg:left-6 xl:left-8 bg-white/90 backdrop-blur-sm rounded-2xl p-3 shadow-2xl transform -rotate-6 hover:rotate-0 transition-all duration-700 opacity-100 z-20" style="animation: fade-in-up 0.8s ease-out 0.5s both;">
+                    <div class="flex items-center space-x-2">
+                        <div class="w-10 h-1x0 bg-gradient-to-r from-green-500 to-emerald-600 rounded-full flex items-center justify-center flex-shrink-0">
+                            <span class="text-white text-lg">🌱</span>
+                        </div>
+                        <div>
+                            <div class="text-xl font-bold text-gray-800">100+</div>
+                            <div class="text-xs text-gray-600">Organic Farms</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 2 - Top Right (Moved further right) -->
+                <div class="data-card absolute top-32 -right-2 md:top-40 md:-right-2 lg:-right-2 xl:-right-2 bg-white/90 backdrop-blur-sm rounded-2xl p-3 shadow-2xl transform rotate-6 hover:rotate-0 transition-all duration-700 opacity-100 z-20" style="animation: fade-in-up 0.8s ease-out 1s both;">
+                    <div class="flex items-center space-x-2">
+                        <div class="w-10 h-10 bg-gradient-to-r from-amber-500 to-orange-500 rounded-full flex items-center justify-center flex-shrink-0">
+                            <span class="text-white text-lg">⭐</span>
+                        </div>
+                        <div>
+                            <div class="text-xl font-bold text-gray-800">4.8★</div>
+                            <div class="text-xs text-gray-600">Customer Rating</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 3 - Bottom Left (Moved up and right) -->
+                <div class="data-card absolute bottom-32 left-4 md:bottom-40 md:left-16 lg:left-24 xl:left-32 bg-white/90 backdrop-blur-sm rounded-2xl p-3 shadow-2xl transform rotate-6 hover:rotate-0 transition-all duration-700 opacity-100 z-20" style="animation: fade-in-up 0.8s ease-out 2s both;">
+                    <div class="flex items-center space-x-2">
+                        <div class="w-10 h-10 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full flex items-center justify-center flex-shrink-0">
+                            <span class="text-white text-lg">📦</span>
+                        </div>
+                        <div>
+                            <div class="text-xl font-bold text-gray-800">5000+</div>
+                            <div class="text-xs text-gray-600">Deliveries</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 4 - Bottom Right (Moved up and left) -->
+                <div class="data-card absolute bottom-32 right-4 md:bottom-40 md:right-16 lg:right-24 xl:right-32 bg-white/90 backdrop-blur-sm rounded-2xl p-3 shadow-2xl transform -rotate-12 hover:rotate-0 transition-all duration-700 opacity-100 z-20" style="animation: fade-in-up 0.8s ease-out 3s both;">
+                    <div class="flex items-center space-x-2">
+                        <div class="w-10 h-10 bg-gradient-to-r from-yellow-500 to-orange-600 rounded-full flex items-center justify-center flex-shrink-0">
+                            <span class="text-white text-lg">🏆</span>
+                        </div>
+                        <div>
+                            <div class="text-xl font-bold text-gray-800">1000+</div>
+                            <div class="text-xs text-gray-600">Happy Customers</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-center z-10 relative px-4 py-16 md:py-24">
+                <div class="relative max-w-6xl mx-auto">
+                    <h2 class="text-5xl md:text-7xl lg:text-8xl font-playfair leading-tight text-white drop-shadow-2xl mb-6 px-4">The Royal Sithaphal</h2>
+                    <p class="text-xl md:text-2xl text-green-100 font-medium mb-8 max-w-2xl mx-auto drop-shadow-lg">Experience the divine taste of nature's sweetest gift, cherished since ancient times</p>
+                    <div class="flex flex-col sm:flex-row justify-center gap-4 mt-10">
+                    <a href="#story-trigger" class="bg-white text-green-800 hover:bg-green-50 font-semibold py-3 px-8 rounded-full transition-all duration-300 transform hover:scale-105 shadow-lg">
+                        Discover the Story
+                    </a>
+                    <a href="#products" class="bg-transparent border-2 border-white text-white hover:bg-white/10 font-semibold py-3 px-8 rounded-full transition-all duration-300 transform hover:scale-105">
+                        Shop Now
+                    </a>
+                </div>
+            </div>
+        </section>
+        
+        <!-- The Story of Sithaphal Section -->
+        <section class="py-16 bg-gradient-to-br from-green-50 to-emerald-50">
+            <div class="container mx-auto px-6 max-w-5xl">
+                <div class="text-center mb-12">
+                    <span class="text-green-600 font-medium mb-4 inline-block">Did You Know?</span>
+                    <h2 class="text-4xl md:text-5xl font-playfair text-gray-900 mb-6">What Connects Sita Mata to This Divine Fruit?</h2>
+                    <div class="w-24 h-1 bg-green-500 mx-auto mb-8"></div>
+                    
+                    <!-- Interactive Question Card -->
+                    <div id="story-trigger" class="max-w-2xl mx-auto bg-white rounded-xl shadow-lg overflow-hidden cursor-pointer transform hover:scale-105 transition-transform duration-300 group">
+                        <div class="p-8 text-center">
+                            <div class="w-20 h-20 mx-auto mb-6 rounded-full bg-green-50 flex items-center justify-center text-green-500 group-hover:bg-green-100 transition-colors">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8.228 9c.549-.554 1.396-.918 2.347-.918 1.747 0 3.17 1.391 3.17 3.1 0 1.69-1.39 3.1-3.17 3.1-1.53 0-2.83-1.1-3.07-2.5M9 9h.01M15 9h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            </div>
+                            <h3 class="text-2xl font-playfair text-gray-800 mb-4">Why is it called Sita-Phal?</h3>
+                            <p class="text-gray-600 mb-4">Click to discover the ancient legend behind this divine fruit's name</p>
+                            <button class="px-6 py-2 bg-green-600 text-white rounded-full text-sm font-medium hover:bg-green-700 transition-colors flex items-center mx-auto">
+                                Reveal the Story
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Hidden Content (Revealed on click) -->
+                <div id="story-content" class="hidden">
+                
+                <!-- Sita Mata's Story -->
+                <div class="bg-white rounded-2xl shadow-xl overflow-hidden mb-12">
+                    <div class="md:flex">
+                        <div class="md:w-1/2 p-8 md:p-12">
+                            <h3 class="text-3xl font-playfair text-gray-900 mb-6">Sita Mata & The Divine Fruit</h3>
+                            <p class="text-gray-700 leading-relaxed mb-6">
+                                During her exile in the forest, Sita Mata is said to have survived on this sweet, creamy fruit. The local people, witnessing her strength and purity, named it "Sita-phal" in her honor. The fruit's bumpy green exterior is said to resemble Sita's veil, symbolizing how true beauty and strength often lie beneath the surface.
+                            </p>
+                            <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
+                                <p class="text-yellow-800 italic">"Just as Sita's inner strength sustained her through trials, this fruit became a symbol of resilience and divine nourishment."</p>
+                            </div>
+                        </div>
+                        <div class="md:w-1/2 relative">
+                            <img src="Gemini_Generated_Image_vocg20vocg20vocg.png" alt="Sita Mata in the forest" class="w-full h-full object-cover rounded-lg shadow-xl">
+                            <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-6 rounded-b-lg">
+                                <p class="text-white text-sm">Illustration of Sita Mata during her exile in the forest</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Benefits and Facts -->
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div class="bg-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-300">
+                        <div class="flex items-center text-green-600 mb-4">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                            </svg>
+                            <h3 class="text-2xl font-playfair">The Legend</h3>
+                        </div>
+                        <p class="text-gray-700 leading-relaxed mb-6">
+                            Known as the "fruit of the gods," Sithaphal's legend is deeply intertwined with the Ramayana. During her exile, Sita Mata found sustenance in this fruit, and its name "Sita-phal" became a testament to her resilience. The fruit's unique appearance - a rough exterior hiding sweet, nourishing flesh - mirrors Sita's own journey of strength and purity.
+                        </p>
+                        <div class="bg-green-50 p-4 rounded-lg">
+                            <p class="text-green-800 italic">"The fruit that sustained Sita Mata in the forest now brings divine nourishment to your table."</p>
+                        </div>
+                    </div>
+                    
+                    <div class="space-y-6">
+                        <div class="bg-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-300">
+                            <div class="flex items-center text-green-600 mb-4">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                </svg>
+                                <h3 class="text-2xl font-playfair">Divine Benefits</h3>
+                            </div>
+                            <ul class="space-y-3 text-gray-700">
+                                <li class="flex items-start">
+                                    <span class="text-green-500 mr-2">✓</span>
+                                    <span><strong>Nature's Custard</strong> - Creamy, vanilla-like flavor that delights the senses</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <span class="text-green-500 mr-2">✓</span>
+                                    <span><strong>Rich in Nutrients</strong> - Packed with Vitamin C, B6, iron, and powerful antioxidants</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <span class="text-green-500 mr-2">✓</span>
+                                    <span><strong>Cooling Properties</strong> - Naturally balances body heat according to Ayurveda</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <span class="text-green-500 mr-2">✓</span>
+                                    <span><strong>Diabetic-Friendly</strong> - Low glycemic index makes it suitable for all</span>
+                                </li>
+                            </ul>
+                        </div>
+                        
+                        <div class="bg-amber-50 p-6 rounded-2xl shadow-inner border border-amber-100">
+                            <div class="flex items-start">
+                                <span class="text-amber-500 mr-3 text-2xl">💡</span>
+                                <div>
+                                    <h4 class="font-playfair text-amber-800 text-lg mb-1">Did You Know?</h4>
+                                    <p class="text-amber-800 text-sm">The seeds of Sithaphal are not edible, but they contain natural compounds used in traditional medicine. The creamy pulp is where the magic lies!</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Benefits Section with Gallery -->
+        <section class="py-16 bg-gradient-to-br from-green-50 to-emerald-50">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-16">
+                    <h2 class="text-4xl font-playfair text-gray-900 mb-4">The Royal Sithaphal</h2>
+                    <div class="w-24 h-1 bg-green-500 mx-auto mb-6"></div>
+                    <p class="text-gray-600 max-w-3xl mx-auto">Discover the exquisite beauty and rich heritage of Sithaphal, nature's sweetest gift</p>
+                </div>
+                
+                <!-- Image Gallery Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+                    <div class="group relative overflow-hidden rounded-2xl shadow-xl transform transition-all duration-500 hover:scale-105">
+                        <img src="Gemini_Generated_Image_jvbntjvbntjvbntj.png" alt="Fresh Sithaphal on tree" class="w-full h-80 object-cover">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-6 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                            <div class="text-white">
+                                <h4 class="text-xl font-semibold mb-1">Fresh from the Orchard</h4>
+                                <p class="text-sm text-green-100">Naturally grown, hand-picked with care</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="group relative overflow-hidden rounded-2xl shadow-xl transform transition-all duration-500 hover:scale-105">
+                        <img src="Gemini_Generated_Image_9v176i9v176i9v17.png" alt="Ripe Sithaphal fruit" class="w-full h-80 object-cover">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-6 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                            <div class="text-white">
+                                <h4 class="text-xl font-semibold mb-1">Perfectly Ripe</h4>
+                                <p class="text-sm text-green-100">Sweet, creamy, and full of flavor</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="group relative overflow-hidden rounded-2xl shadow-xl transform transition-all duration-500 hover:scale-105">
+                        <img src="Gemini_Generated_Image_jxmzvujxmzvujxmz.png" alt="Sithaphal close-up" class="w-full h-80 object-cover">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-6 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                            <div class="text-white">
+                                <h4 class="text-xl font-semibold mb-1">Nature's Artistry</h4>
+                                <p class="text-sm text-green-100">Each fruit is uniquely beautiful</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <h3 class="text-4xl font-playfair text-center mb-12 text-green-800">Nature's Perfect Gift</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div class="bg-white p-8 rounded-lg shadow-md transform hover:scale-105 transition-transform">
+                        <div class="text-green-600 mb-4">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                            </svg>
+                        </div>
+                        <h4 class="text-xl font-playfair text-center mb-4">Heart-Healthy</h4>
+                        <p class="text-gray-600 text-center">Rich in antioxidants and minerals that support cardiovascular health and boost immunity.</p>
+                    </div>
+                    <div class="bg-white p-8 rounded-lg shadow-md transform hover:scale-105 transition-transform">
+                        <div class="text-green-600 mb-4">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
+                        <h4 class="text-xl font-playfair text-center mb-4">100% Organic</h4>
+                        <p class="text-gray-600 text-center">Naturally grown without pesticides, preserving the authentic taste and nutritional value.</p>
+                    </div>
+                    <div class="bg-white p-8 rounded-lg shadow-md transform hover:scale-105 transition-transform">
+                        <div class="text-green-600 mb-4">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                            </svg>
+                        </div>
+                        <h4 class="text-xl font-playfair text-center mb-4">Energy Boost</h4>
+                        <p class="text-gray-600 text-center">Natural sugars and vitamins provide sustained energy throughout your day.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Features Section -->
+        <section class="py-16 bg-white">
+            <div class="container mx-auto px-6">
+                <div class="flex flex-col md:flex-row items-center justify-between gap-12">
+                    <div class="md:w-1/2">
+                        <h3 class="text-4xl font-playfair mb-8 text-green-800">Why Choose Our Sithaphal?</h3>
+                    
+                    <!-- Origin Highlight -->
+                    <div class="mb-6 p-6 bg-green-50 rounded-xl border-l-4 border-green-500">
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0">
+                                <svg class="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                </svg>
+                            </div>
+                            <div class="ml-4">
+                                <h4 class="text-xl font-semibold text-green-800">Directly Imported from Bopal, India</h4>
+                                <p class="mt-2 text-gray-700">Sourced exclusively from the fertile lands of Bopal, India - the world's premier region for growing the sweetest, most aromatic Sithaphal (custard apples). Our direct partnerships with local farmers ensure you receive only the finest quality fruits.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Transportation Highlight -->
+                    <div class="mb-8 p-6 bg-blue-50 rounded-xl border-l-4 border-blue-500">
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0">
+                                <svg class="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                                </svg>
+                            </div>
+                            <div class="ml-4">
+                                <h4 class="text-xl font-semibold text-blue-800">Premium Temperature-Controlled Shipping</h4>
+                                <p class="mt-2 text-gray-700">Each Sithaphal is carefully packed in specialized ice boxes immediately after harvesting, maintaining the perfect temperature throughout its journey. Our advanced cold chain logistics ensure your fruit arrives in perfect condition - fresh, undamaged, and bursting with flavor, just as if it was picked from the orchard.</p>
+                            </div>
+                        </div>
+                    </div>
+                    </div>
+                    <div class="md:w-1/2 space-y-6">
+                        <div class="rounded-lg shadow-xl overflow-hidden hover:shadow-2xl transition-shadow">
+                            <img src="Gemini_Generated_Image_yr0yw5yr0yw5yr0y.png" alt="Fresh Sithaphal Harvest" class="w-full h-auto object-cover">
+                        </div>
+                        <div class="rounded-lg shadow-xl overflow-hidden hover:shadow-2xl transition-shadow">
+                            <img src="Gemini_Generated_Image_s8b2yts8b2yts8b2.png" alt="Organic Sithaphal Farm" class="w-full h-auto object-cover">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Testimonials Section -->
+        <section class="py-16 bg-gray-50">
+            <div class="container mx-auto px-6">
+                <h3 class="text-4xl font-playfair text-center mb-12 text-green-800">What Our Customers Say</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div class="bg-white p-8 rounded-lg shadow-md">
+                        <div class="flex text-yellow-400 mb-4 justify-center">
+                            ★★★★★
+                        </div>
+                        <p class="text-gray-600 text-center mb-6">"The best Sithaphal I've ever tasted! The delivery was quick, and the fruits were perfectly ripe."</p>
+                        <div class="text-center">
+                            <h4 class="font-semibold">Sarah Johnson</h4>
+                            <p class="text-sm text-gray-500">Regular Customer</p>
+                        </div>
+                    </div>
+                    <div class="bg-white p-8 rounded-lg shadow-md">
+                        <div class="flex text-yellow-400 mb-4 justify-center">
+                            ★★★★★
+                        </div>
+                        <p class="text-gray-600 text-center mb-6">"Incredible quality and freshness. The family pack is perfect for our weekly needs."</p>
+                        <div class="text-center">
+                            <h4 class="font-semibold">Michael Chen</h4>
+                            <p class="text-sm text-gray-500">Verified Buyer</p>
+                        </div>
+                    </div>
+                    <div class="bg-white p-8 rounded-lg shadow-md">
+                        <div class="flex text-yellow-400 mb-4 justify-center">
+                            ★★★★★
+                        </div>
+                        <p class="text-gray-600 text-center mb-6">"The organic Sithaphal is worth every penny. You can taste the difference in quality."</p>
+                        <div class="text-center">
+                            <h4 class="font-semibold">Emma Davis</h4>
+                            <p class="text-sm text-gray-500">Health Enthusiast</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Recipe Section -->
+        <section class="py-20 bg-white">
+            <div class="container mx-auto px-6 text-center">
+                 <h3 class="text-4xl font-playfair text-center mb-6 text-green-800">Discover Delicious Recipes</h3>
+                 <p class="text-gray-600 max-w-2xl mx-auto mb-8">Unlock the culinary potential of Sithaphal with unique recipes generated by AI. From smoothies to desserts, find your next favorite dish.</p>
+                <button id="get-recipes-btn" class="btn-primary px-8 py-4 rounded-lg text-lg font-semibold flex items-center space-x-2 mx-auto">
+                    <span>✨ Generate Recipes</span>
+                </button>
+            </div>
+        </section>
+    </main>
+
+    <!-- Products Page -->
+    <section id="products-page" class="page hidden py-24 bg-white">
+        <div class="container mx-auto px-6">
+            <div class="flex justify-between items-center mb-8">
+                <h2 class="text-3xl font-playfair text-green-800">Our Products</h2>
+                <div class="relative w-64">
+                    <input type="text" id="product-search" placeholder="Search products..." class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                </div>
+            </div>
+            <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+                <!-- Filter Sidebar -->
+                <aside class="lg:col-span-1 bg-white/80 backdrop-blur-sm p-8 rounded-2xl shadow-xl border border-green-100 h-fit hover:shadow-2xl transition-all duration-300">
+                    <div class="flex items-center mb-8">
+                        <div class="w-8 h-8 bg-gradient-to-r from-green-500 to-emerald-500 rounded-lg mr-3 flex items-center justify-center">
+                            <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V3z" clip-rule="evenodd"></path>
+                            </svg>
+                        </div>
+                        <h3 class="text-2xl font-playfair text-gray-800">Smart Filters</h3>
+                    </div>
+                    
+                    <!-- Sort By -->
+                    <div class="mb-8">
+                        <label for="sort-by" class="block text-sm font-semibold text-gray-700 mb-3 flex items-center">
+                            <span class="w-2 h-2 bg-green-500 rounded-full mr-2"></span>
+                            Sort by
+                        </label>
+                        <select id="sort-by" class="w-full border-2 border-green-100 rounded-xl shadow-sm focus:border-green-400 focus:ring-green-400 focus:ring-2 py-3 px-4 bg-gradient-to-r from-white to-green-50 transition-all duration-200">
+                            <option value="default">✨ Featured</option>
+                            <option value="price-asc">💰 Price: Low to High</option>
+                            <option value="price-desc">💎 Price: High to Low</option>
+                        </select>
+                    </div>
+
+                    <!-- Price Range -->
+                    <div class="mb-8">
+                        <label for="price-range" class="block text-sm font-semibold text-gray-700 mb-3 flex items-center">
+                            <span class="w-2 h-2 bg-emerald-500 rounded-full mr-2"></span>
+                            Price Range
+                        </label>
+                        <div class="bg-gradient-to-r from-green-50 to-emerald-50 p-4 rounded-xl border border-green-100">
+                            <input type="range" id="price-range" min="0" max="30" value="30" class="w-full h-2 bg-gradient-to-r from-green-200 to-emerald-300 rounded-lg appearance-none cursor-pointer slider">
+                            <div class="flex justify-between text-sm font-medium text-gray-700 mt-3">
+                                <span class="bg-white px-2 py-1 rounded-lg shadow-sm">$0</span>
+                                <span id="price-value" class="bg-green-500 text-white px-2 py-1 rounded-lg shadow-sm">$30</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Varieties -->
+                    <div class="mb-6">
+                        <h4 class="text-sm font-medium text-gray-700 mb-2">Varieties</h4>
+                        <div id="variety-filters" class="space-y-2">
+                           <!-- Checkboxes will be injected here -->
+                        </div>
+                    </div>
+                    
+                    <!-- Quantity -->
+                    <div>
+                        <h4 class="text-sm font-medium text-gray-700 mb-2">Quantity</h4>
+                        <div id="quantity-filters" class="space-y-2">
+                           <div class="flex items-center">
+                               <input id="qty-single" name="quantity" type="checkbox" value="single" class="h-4 w-4 text-green-600 border-gray-300 rounded focus:ring-green-500">
+                               <label for="qty-single" class="ml-3 text-sm text-gray-600">Single Fruit</label>
+                           </div>
+                           <div class="flex items-center">
+                               <input id="qty-pack" name="quantity" type="checkbox" value="pack" class="h-4 w-4 text-green-600 border-gray-300 rounded focus:ring-green-500">
+                               <label for="qty-pack" class="ml-3 text-sm text-gray-600">Pack (3+)</label>
+                           </div>
+                        </div>
+                    </div>
+                </aside>
+
+                <!-- Product Grid -->
+                <div class="lg:col-span-3">
+                     <div id="product-list" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+                        <!-- Product items will be injected here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Auth Page -->
+    <section id="auth-page" class="page hidden flex items-center justify-center py-24 bg-gray-50">
+        <div class="w-full max-w-md">
+            <div class="bg-white shadow-md rounded-lg p-8">
+                <div class="mb-6 flex border-b">
+                    <button id="signin-tab" class="flex-1 py-2 text-center font-semibold text-green-600 border-b-2 border-green-600">Sign In</button>
+                    <button id="signup-tab" class="flex-1 py-2 text-center font-semibold text-gray-500">Sign Up</button>
+                </div>
+
+                <!-- Sign In Form -->
+                <form id="signin-form">
+                    <div class="mb-4">
+                        <label for="signin-email" class="block text-sm font-medium text-gray-700">Email</label>
+                        <input type="email" id="signin-email" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-green-500 focus:border-green-500" required>
+                    </div>
+                    <div class="mb-6 password-container">
+                        <label for="signin-password" class="block text-sm font-medium text-gray-700">Password</label>
+                        <input type="password" id="signin-password" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-green-500 focus:border-green-500" required>
+                        <span class="password-toggle" data-target="signin-password">
+                            <!-- Eye icon will be injected by JS -->
+                        </span>
+                    </div>
+                    <button type="submit" class="w-full btn-primary py-2 rounded-lg">Sign In</button>
+                </form>
+
+                <!-- Sign Up Form -->
+                <form id="signup-form" class="hidden space-y-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label for="signup-firstname" class="block text-sm font-medium text-gray-700">First Name</label>
+                            <input type="text" id="signup-firstname" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3" required>
+                        </div>
+                        <div>
+                            <label for="signup-lastname" class="block text-sm font-medium text-gray-700">Last Name <span class="text-xs text-gray-500">(Optional)</span></label>
+                            <input type="text" id="signup-lastname" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3">
+                        </div>
+                    </div>
+                    <div>
+                        <label for="signup-dob" class="block text-sm font-medium text-gray-700">Date of Birth</label>
+                        <input type="date" id="signup-dob" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3" required>
+                    </div>
+                    <div>
+                        <label for="signup-email" class="block text-sm font-medium text-gray-700">Email</label>
+                        <input type="email" id="signup-email" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3" required>
+                    </div>
+                    <div class="password-container">
+                        <label for="signup-password" class="block text-sm font-medium text-gray-700">Password</label>
+                        <input type="password" id="signup-password" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3" required>
+                         <span class="password-toggle" data-target="signup-password">
+                            <!-- Eye icon will be injected by JS -->
+                        </span>
+                    </div>
+                    <div class="password-container">
+                        <label for="signup-confirm-password" class="block text-sm font-medium text-gray-700">Confirm Password</label>
+                        <input type="password" id="signup-confirm-password" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3" required>
+                         <span class="password-toggle" data-target="signup-confirm-password">
+                            <!-- Eye icon will be injected by JS -->
+                        </span>
+                    </div>
+                    <button type="submit" class="w-full btn-primary py-2 rounded-lg">Sign Up</button>
+                </form>
+
+                <div class="mt-6">
+                    <div class="relative">
+                        <div class="absolute inset-0 flex items-center">
+                            <div class="w-full border-t border-gray-300"></div>
+                        </div>
+                        <div class="relative flex justify-center text-sm">
+                            <span class="px-2 bg-white text-gray-500">Or continue with</span>
+                        </div>
+                    </div>
+                    <div class="mt-6">
+                        <button id="google-signin-btn" class="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                            <svg class="w-5 h-5" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"></path><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"></path><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"></path><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"></path><path fill="none" d="M0 0h48v48H0z"></path></svg>
+                            <span class="ml-4">Sign in with Google</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Modals (Cart, Recipe, Payment) -->
+    <div id="cart-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-[60] flex items-center justify-center">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-md mx-4">
+            <div class="p-6">
+                <div class="flex justify-between items-center border-b pb-4">
+                    <h4 class="text-2xl font-playfair text-green-800">Your Cart</h4>
+                    <button id="close-cart-button" class="text-gray-500 hover:text-gray-800 text-3xl leading-none">&times;</button>
+                </div>
+                <div id="cart-items" class="mt-6 max-h-64 overflow-y-auto"></div>
+                <div class="mt-6 border-t pt-4">
+                    <div class="flex justify-between items-center font-bold text-lg">
+                        <span>Total</span>
+                        <span id="cart-total">$0.00</span>
+                    </div>
+                    <button id="checkout-button" class="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-bold py-3 rounded-lg mt-6 transition-all duration-300" onclick="window.location.href='payment.html'">Proceed to Checkout</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="recipe-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-[60] flex items-center justify-center">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-2xl mx-4 h-3/4 flex flex-col">
+            <div class="p-6 border-b flex justify-between items-center">
+                <h4 class="text-2xl font-playfair text-green-800">✨ Sithaphal Recipes</h4>
+                <button id="close-recipe-button" class="text-gray-500 hover:text-gray-800 text-3xl leading-none">&times;</button>
+            </div>
+            <div id="recipe-content" class="p-6 overflow-y-auto"></div>
+        </div>
+    </div>
+
+    <div id="payment-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-[60] flex items-center justify-center">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-md mx-4">
+            <div class="p-6">
+                <h4 class="text-2xl font-playfair text-green-800 mb-4">Secure Checkout</h4>
+                <form id="payment-form">
+                    <div class="mb-4">
+                        <label for="card-number" class="block text-sm font-medium text-gray-700">Card Number</label>
+                        <input type="text" id="card-number" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-green-500 focus:border-green-500" placeholder="•••• •••• •••• ••••">
+                    </div>
+                    <div class="grid grid-cols-3 gap-4 mb-4">
+                        <div>
+                            <label for="expiry-month" class="block text-sm font-medium text-gray-700">Month</label>
+                            <input type="text" id="expiry-month" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-green-500 focus:border-green-500" placeholder="MM">
+                        </div>
+                        <div>
+                            <label for="expiry-year" class="block text-sm font-medium text-gray-700">Year</label>
+                            <input type="text" id="expiry-year" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-green-500 focus:border-green-500" placeholder="YY">
+                        </div>
+                        <div>
+                            <label for="cvc" class="block text-sm font-medium text-gray-700">CVC</label>
+                            <input type="text" id="cvc" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-green-500 focus:border-green-500" placeholder="•••">
+                        </div>
+                    </div>
+                    <button type="submit" class="w-full btn-primary py-3 rounded-lg">Pay Now</button>
+                    <button type="button" id="cancel-payment-button" class="w-full bg-gray-200 text-gray-800 py-3 rounded-lg mt-2">Cancel</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer id="contact" class="bg-gray-800 text-white pt-16 pb-8">
+        <div class="container mx-auto px-6">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center md:text-left">
+                <!-- Subscription and Contact Info -->
+                <div class="md:col-span-1">
+                    <h5 class="font-bold text-lg mb-4">Subscribe to our emails</h5>
+                    <form class="flex max-w-sm mx-auto md:mx-0">
+                        <input type="email" placeholder="Email" class="w-full bg-gray-700 border-gray-600 text-white rounded-l-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-500">
+                        <button type="submit" class="bg-green-600 hover:bg-green-700 rounded-r-md px-4 py-2 transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
+                        </button>
+                    </form>
+                    <p class="mt-4 text-sm text-gray-400">Email: sithaphal.fresh@example.com</p>
+                    <p class="text-sm text-gray-400">Contact Info: +1 (555) 123-4567</p>
+                </div>
+
+                <!-- Social Media -->
+                <div class="md:col-span-1 md:text-center">
+                    <h5 class="font-bold text-lg mb-4">Follow Us</h5>
+                    <a href="#" class="inline-flex items-center space-x-2 text-gray-300 hover:text-white transition-colors">
+                        <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.85s-.011 3.584-.069 4.85c-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07s-3.584-.012-4.85-.07c-3.252-.148-4.771-1.691-4.919-4.919-.058-1.265-.069-1.645-.069-4.85s.011-3.584.069 4.85c.149-3.225 1.664-4.771 4.919 4.919 1.266-.058 1.644-.07 4.85-.07zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948s.014 3.667.072 4.947c.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072s3.667-.014 4.947-.072c4.358-.2 6.78-2.618 6.98-6.98.059-1.281.073-1.689.073-4.948s-.014-3.667-.072-4.947c-.2-4.358-2.618-6.78-6.98-6.98-1.281-.059-1.689-.073-4.948-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.162 6.162 6.162 6.162-2.759 6.162-6.162-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4s1.791-4 4-4 4 1.79 4 4-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44 1.441-.645 1.441-1.44-.645-1.44-1.441-1.44z"/></svg>
+                        <span>@sithaphal_royal</span>
+                    </a>
+                </div>
+
+                <!-- WhatsApp Button -->
+                <div class="md:col-span-1 md:text-right flex items-center justify-center md:justify-end">
+                    <a href="https://wa.me/19084993370" target="_blank" class="inline-flex items-center space-x-2 bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-6 rounded-full transition-colors">
+                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.886-.001 2.267.655 4.398 1.907 6.18l-1.299 4.745 4.833-1.276z"/></svg>
+                        <span>Chat on WhatsApp</span>
+                    </a>
+                </div>
+            </div>
+
+            <div class="border-t border-gray-700 mt-8 pt-8">
+                <div class="text-center mb-4">
+                    <p class="text-sm text-gray-400">Secure Payments</p>
+                    <div class="flex justify-center space-x-4 mt-2 text-2xl">
+                        <span>💳</span> <span></span> <span>🅿️</span> <span>📦</span>
+                    </div>
+                </div>
+                <div class="text-center text-sm text-gray-400">
+                    <div class="space-x-4">
+                        <a href="#" class="hover:text-white transition-colors">Privacy Policy</a>
+                        <a href="#" class="hover:text-white transition-colors">Refund Policy</a>
+                        <a href="#" class="hover:text-white transition-colors">Terms of Service</a>
+                    </div>
+                    <p class="mt-4">&copy; 2024 Sithaphal. All rights reserved.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+
+
+    <!-- Chat Icon -->
+    <div id="chat-icon" class="fixed bottom-8 right-8 w-16 h-16 bg-green-600 rounded-full flex items-center justify-center cursor-pointer shadow-lg hover:bg-green-700 transition-colors z-40">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+        </svg>
+    </div>
+
+    <!-- Chat Modal -->
+    <div id="chat-modal" class="hidden">
+        <div class="chat-header">
+            <h5>✨ Sithaphal AI Assistant</h5>
+            <button id="close-chat" aria-label="Close chat">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+        <div id="chat-messages">
+            <!-- Messages will be added here -->
+        </div>
+        <form id="chat-form">
+            <input type="text" id="chat-input" placeholder="Type your message..." autocomplete="off" required>
+            <button type="submit">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="22" y1="2" x2="11" y2="13"></line>
+                    <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                </svg>
+            </button>
+        </form>
+    </div>
+
+    <!-- Load Three.js from CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/build/three.min.js"></script>
+    <!-- Load Supabase client library -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        // Initialize Supabase client
+        document.addEventListener('DOMContentLoaded', function() {
+            window.SUPABASE_URL = 'https://njljzwkgsijqqgurxgpw.supabase.co';
+            window.SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5qbGp6d2tnc2lqcXFndXJ4Z3B3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU4ODIzMjEsImV4cCI6MjA3MTQ1ODMyMX0.MrZRLrpvH3oG1yn1TETVlo5Vy1-IIUit7guqgWw0hyM';
+            window.supabase = supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
+            
+            // Initialize the main application
+            if (typeof initializeApp === 'function') {
+                initializeApp();
+            }
+        });
+    </script>
+    <script src="script.js" defer></script>
+    <script src="chat.js" defer></script>
+    
+    <!-- Bursting Flowers Animation -->
+    <style>
+        @keyframes burst-out {
+            0% {
+                transform: translate(0, 0) scale(0.1);
+                opacity: 0;
+            }
+            5% {
+                opacity: 1;
+            }
+            100% {
+                transform: 
+                    translate(
+                        calc(var(--endX) * 1px), 
+                        calc(var(--endY) * 1px)
+                    ) 
+                    scale(1) 
+                    rotate(calc(var(--rotation) * 1deg));
+                opacity: 0;
+            }
+        }
+        
+        .flower {
+            position: fixed;
+            pointer-events: none;
+            z-index: 1000;
+            font-size: 1.8rem;
+            user-select: none;
+            will-change: transform, opacity;
+            text-shadow: 0 0 8px rgba(255,255,255,0.9);
+            opacity: 0;
+            /* Performance optimizations */
+            backface-visibility: hidden;
+            transform: translateZ(0);
+            -webkit-font-smoothing: subpixel-antialiased;
+            /* Smoother animation */
+            animation-fill-mode: forwards;
+            animation-timing-function: cubic-bezier(0.1, 0.8, 0.2, 1);
+        }
+    </style>
+    
+    <script>
+        // Wait for the window to be fully loaded
+        window.addEventListener('load', function() {
+            console.log('Window loaded, initializing flower animation...');
+            
+            const storyTrigger = document.getElementById('story-trigger');
+            const storyContent = document.getElementById('story-content');
+            const flowers = ['🌸', '🌺', '🌼', '🌹', '🌻', '🌷', '💐', '🏵️'];
+
+            if (!storyTrigger) {
+                console.error('Story trigger button not found!');
+                return;
+            }
+
+            console.log('Story trigger found:', storyTrigger);
+
+            function createFlower(originX, originY) {
+                const flower = document.createElement('div');
+                flower.className = 'flower';
+                
+                // Random flower emoji
+                const randomFlower = flowers[Math.floor(Math.random() * flowers.length)];
+                flower.textContent = randomFlower;
+                
+                // Calculate random end position (filling screen)
+                const angle = Math.random() * Math.PI * 2; // Full circle
+                const distance = 50 + Math.random() * Math.max(window.innerWidth, window.innerHeight) * 0.8;
+                const endX = Math.cos(angle) * distance * (Math.random() > 0.5 ? 1 : -1);
+                const endY = Math.sin(angle) * distance + 100; // Slight downward bias
+                
+                // Optimized for instant burst
+                const duration = 0.8 + Math.random() * 0.4; // 0.8-1.2 seconds
+                const delay = 0; // No delay for instant appearance
+                
+                // Set initial position at button
+                flower.style.position = 'fixed';
+                flower.style.left = `${originX}px`;
+                flower.style.top = `${originY}px`;
+                flower.style.zIndex = '1000';
+                flower.style.pointerEvents = 'none';
+                
+                // Set animation properties
+                flower.style.setProperty('--endX', endX);
+                flower.style.setProperty('--endY', endY);
+                flower.style.setProperty('--rotation', (Math.random() * 1440) - 720);
+                flower.style.fontSize = `${Math.random() * 30 + 15}px`;
+                
+                // Apply animation directly with all properties
+                flower.style.animation = `burst-out ${duration}s ${delay}s linear forwards`;
+                
+                // Add to body
+                document.body.appendChild(flower);
+                
+                // Remove after animation completes
+                setTimeout(() => {
+                    if (flower && flower.parentNode) {
+                        flower.remove();
+                    }
+                }, (duration + delay) * 1000);
+                
+                return flower;
+            }
+
+            function burstFlowers(originX, originY, count = 300) {
+                console.log(`Creating ${count} flowers at (${originX}, ${originY})`);
+                
+                // Clear any existing flowers
+                document.querySelectorAll('.flower').forEach(flower => {
+                    if (flower.parentNode) {
+                        flower.remove();
+                    }
+                });
+                
+                // Create burst of flowers from origin point
+                for (let i = 0; i < count; i++) {
+                    // Small delay between creating each flower for better performance
+                    setTimeout(() => {
+                        createFlower(originX, originY);
+                    }, i * 10);
+                }
+            }
+
+            // Add click event listener
+            storyTrigger.addEventListener('click', function(e) {
+                console.log('Button clicked, triggering flower burst...');
+                e.preventDefault();
+                e.stopPropagation();
+                
+                // Get click position (center of the button)
+                const rect = this.getBoundingClientRect();
+                const x = rect.left + rect.width / 2;
+                const y = rect.top + rect.height / 2;
+                
+                console.log(`Button position: (${x}, ${y})`);
+                
+                // Create a massive burst of flowers (300 for a full screen effect)
+                burstFlowers(x, y, 300);
+                
+                // Show content after a short delay
+                if (storyContent) {
+                    setTimeout(() => {
+                        storyContent.classList.remove('hidden');
+                        storyContent.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        storyTrigger.classList.add('opacity-50');
+                    }, 500);
+                }
+            });
+        });
+    </script>
+</body>
+</html>

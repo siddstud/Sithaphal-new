@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog - Sithaphal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'playfair': ['Playfair Display', 'serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-gray-50">
+    <header class="fixed top-0 left-0 w-full bg-white bg-opacity-80 backdrop-blur-md z-50 shadow-md">
+        <nav class="container mx-auto px-6 py-3 flex justify-between items-center">
+            <a href="index.html" class="text-3xl font-playfair text-green-800 flex-shrink-0">Sithaphal</a>
+            
+            <div class="flex items-center space-x-8 ml-auto">
+                <a href="index.html" class="text-gray-600 hover:text-green-800 transition-colors">Home</a>
+                <a href="products.html" class="text-gray-600 hover:text-green-800 transition-colors">Products</a>
+                <a href="blog.html" class="text-gray-600 hover:text-green-800 transition-colors">Blog</a>
+                <a href="#contact" class="text-gray-600 hover:text-green-800 transition-colors">Contact</a>
+                
+                <button id="cart-button" class="relative p-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-600 hover:text-green-800 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                    </svg>
+                    <span id="cart-count" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center hidden">0</span>
+                </button>
+                
+                <div class="relative">
+                    <button id="profile-button" class="p-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-gray-600 hover:text-green-800 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </button>
+                    <div id="profile-dropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-xl z-20">
+                        <!-- Dropdown content changes based on login state -->
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container mx-auto px-6 pt-24 pb-12">
+        <!-- Blog Header -->
+        <div class="text-center mb-12">
+            <h1 class="text-4xl md:text-5xl font-playfair text-green-800 mb-4">Our Blog</h1>
+            <p class="text-gray-600 max-w-2xl mx-auto">Explore articles about health benefits, recipes, and everything you need to know about Sithaphal.</p>
+        </div>
+
+        <!-- Search and Categories -->
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 space-y-4 md:space-y-0">
+            <div class="relative w-full md:w-64">
+                <input type="text" id="blog-search" placeholder="Search articles..." class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+            </div>
+            <div class="flex space-x-2">
+                <button class="px-4 py-2 text-sm rounded-full bg-green-600 text-white hover:bg-green-700">All</button>
+                <button class="px-4 py-2 text-sm rounded-full bg-gray-200 text-gray-700 hover:bg-gray-300">Health Benefits</button>
+                <button class="px-4 py-2 text-sm rounded-full bg-gray-200 text-gray-700 hover:bg-gray-300">Recipes</button>
+                <button class="px-4 py-2 text-sm rounded-full bg-gray-200 text-gray-700 hover:bg-gray-300">Growing Tips</button>
+            </div>
+        </div>
+
+        <!-- Featured Post -->
+        <div class="bg-white rounded-lg shadow-md overflow-hidden mb-12">
+            <div class="md:flex">
+                <div class="md:flex-shrink-0">
+                    <img class="h-48 w-full md:w-64 object-cover" src="https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=400&h=300&fit=crop&crop=center" alt="Sithaphal tree growing guide">
+                </div>
+                <div class="p-8">
+                    <div class="uppercase tracking-wide text-sm text-green-600 font-semibold">Featured</div>
+                    <h2 class="mt-2 text-2xl font-playfair text-gray-800">Complete Guide to Growing Sithaphal</h2>
+                    <p class="mt-4 text-gray-600">Learn everything about growing your own Sithaphal tree, from selecting the right soil to harvesting the fruits.</p>
+                    <a href="#" class="mt-4 inline-block text-green-600 hover:text-green-800 font-medium">Read More →</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Blog Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <!-- Blog Card 1 -->
+            <article class="bg-white rounded-lg shadow-md overflow-hidden transition-transform hover:-translate-y-1">
+                <div class="aspect-w-16 aspect-h-9">
+                    <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=300&fit=crop&crop=center" alt="Healthy nutrition and vitamins" class="object-cover w-full h-48">
+                </div>
+                <div class="p-6">
+                    <h4 class="text-xl font-playfair text-gray-800 mb-2">Top 5 Health Benefits of Sithaphal</h4>
+                    <p class="text-gray-600 mb-4">Discover why this royal fruit is a powerhouse of nutrients and antioxidants.</p>
+                    <a href="#" class="text-green-600 hover:text-green-800 font-medium">Read More →</a>
+                </div>
+            </article>
+
+            <!-- Blog Card 2 -->
+            <article class="bg-white rounded-lg shadow-md overflow-hidden transition-transform hover:-translate-y-1">
+                <div class="aspect-w-16 aspect-h-9">
+                    <img src="https://images.unsplash.com/photo-1571068316344-75bc76f77890?w=400&h=300&fit=crop&crop=center" alt="Healthy smoothie bowl breakfast" class="object-cover w-full h-48">
+                </div>
+                <div class="p-6">
+                    <h4 class="text-xl font-playfair text-gray-800 mb-2">Sithaphal Smoothie Bowl Recipe</h4>
+                    <p class="text-gray-600 mb-4">Start your day with this nutritious and delicious smoothie bowl featuring fresh Sithaphal.</p>
+                    <a href="#" class="text-green-600 hover:text-green-800 font-medium">Read More →</a>
+                </div>
+            </article>
+
+            <!-- Blog Card 3 -->
+            <article class="bg-white rounded-lg shadow-md overflow-hidden transition-transform hover:-translate-y-1">
+                <div class="aspect-w-16 aspect-h-9">
+                    <img src="https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400&h=300&fit=crop&crop=center" alt="Seasonal fruit harvest calendar" class="object-cover w-full h-48">
+                </div>
+                <div class="p-6">
+                    <h4 class="text-xl font-playfair text-gray-800 mb-2">Seasonal Guide to Sithaphal</h4>
+                    <p class="text-gray-600 mb-4">Learn when and how to pick the perfect Sithaphal throughout the year.</p>
+                    <a href="#" class="text-green-600 hover:text-green-800 font-medium">Read More →</a>
+                </div>
+            </article>
+        </div>
+
+        <!-- Pagination -->
+        <div class="flex justify-center space-x-2 mt-12">
+            <button class="px-4 py-2 text-sm rounded-lg bg-gray-200 text-gray-700 hover:bg-gray-300">Previous</button>
+            <button class="px-4 py-2 text-sm rounded-lg bg-green-600 text-white hover:bg-green-700">1</button>
+            <button class="px-4 py-2 text-sm rounded-lg bg-gray-200 text-gray-700 hover:bg-gray-300">2</button>
+            <button class="px-4 py-2 text-sm rounded-lg bg-gray-200 text-gray-700 hover:bg-gray-300">3</button>
+            <button class="px-4 py-2 text-sm rounded-lg bg-gray-200 text-gray-700 hover:bg-gray-300">Next</button>
+        </div>
+    </main>
+
+    <script type="module" src="script.js"></script>
+</body>
+</html>
